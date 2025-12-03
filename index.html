@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跟我学说话 (更年期版)</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>跟我学说话 <span class="badge">更年期版</span></h1>
+        </header>
+
+        <main id="app-main">
+            <!-- View 1: Welcome / Login -->
+            <div id="view-welcome" class="app-view active">
+                <div class="welcome-card" id="welcome-content">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-heart-circle-bolt"></i>
+                    </div>
+                    <h2>温暖沟通 · 爱的连接</h2>
+                    <p>在更年期的特殊时光里，<br>让我们学会用爱说话，重建亲子关系。</p>
+                    <button id="btn-start" class="primary-btn">开始旅程</button>
+                    <div class="auth-link">
+                        <a href="#" onclick="toggleRegistration()">还没有账号？立即注册</a>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="welcome-card hidden" id="registration-form">
+                    <h2 class="view-title">欢迎加入</h2>
+                    <form id="form-register" onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="reg-name">您的姓名</label>
+                            <input type="text" id="reg-name" placeholder="请输入姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-phone">手机号码</label>
+                            <input type="tel" id="reg-phone" placeholder="请输入手机号" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">电子邮箱</label>
+                            <input type="email" id="reg-email" placeholder="请输入邮箱" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-child-age">孩子年龄</label>
+                            <input type="number" id="reg-child-age" placeholder="请输入孩子年龄" required min="1" max="100">
+                        </div>
+                        <button type="submit" class="primary-btn" style="width: 100%; margin-top: 1rem;">注册账号</button>
+                    </form>
+                    <div class="auth-link">
+                        <a href="#" onclick="toggleRegistration()">已有账号？返回登录</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 2: Topic Selection -->
+            <div id="view-topics" class="app-view hidden">
+                <h2 class="view-title">请选择对话场景</h2>
+                <div class="topic-grid" id="topic-grid">
+                    <!-- Topics will be injected by JS -->
+                </div>
+            </div>
+
+            <!-- View 3: Scenario Practice -->
+            <div id="view-scenario" class="app-view hidden">
+                <div class="scenario-header">
+                    <button class="back-btn" onclick="showView('view-topics')"><i
+                            class="fa-solid fa-chevron-left"></i></button>
+                    <span id="scenario-category">场景类别</span>
+                </div>
+
+                <div class="child-message-box">
+                    <div class="avatar child-avatar">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Child">
+                    </div>
+                    <div class="message-bubble">
+                        <p id="child-text">"我不想上学了！太累了！"</p>
+                    </div>
+                </div>
+
+                <!-- Two Choice Buttons -->
+                <div class="choice-container" id="choice-section">
+                    <button class="choice-btn btn-common" onclick="showResponse('common')">
+                        <div class="btn-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="btn-label">惯性反应 (扣分)</div>
+                    </button>
+                    <button class="choice-btn btn-eap" onclick="showResponse('eap')">
+                        <div class="btn-icon"><i class="fa-solid fa-seedling"></i></div>
+                        <div class="btn-label">EAP 建议 (加分)</div>
+                    </button>
+                </div>
+
+                <!-- Response Display Area -->
+                <div id="response-display" class="response-display hidden">
+                    <div id="response-content-common" class="response-content hidden">
+                        <div class="tag-warning" id="tag-common">批评 / 指责</div>
+                        <p id="text-common" class="response-text">"..."</p>
+                    </div>
+                    <div id="response-content-eap" class="response-content hidden">
+                        <div class="tag-success" id="tag-eap">共情 / 接纳</div>
+                        <p id="text-eap" class="response-text">"..."</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="secondary-btn" onclick="toggleCustomInput()">
+                        <i class="fa-solid fa-pen-to-square"></i> 输入孩子的话
+                    </button>
+                    <button class="next-btn" onclick="nextScenario()">下一个场景 <i
+                            class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Custom Input Modal -->
+                <div id="custom-input-modal" class="modal-overlay hidden" onclick="toggleCustomInput()">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h3><i class="fa-solid fa-pen"></i> 自定义练习</h3>
+                            <button class="close-btn" onclick="toggleCustomInput()"><i
+                                    class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>孩子说了什么？</p>
+                            <textarea id="custom-child-text" placeholder="例如：我不喜欢你管我！" rows="3"
+                                style="width:100%; padding:0.5rem; border-radius:10px; border:1px solid #ddd; margin-bottom:1rem;"></textarea>
+                            <button class="primary-btn" onclick="generateEAPResponse()" style="width:100%">获取 EAP
+                                回应建议</button>
+
+                            <div id="custom-response-area" class="hidden"
+                                style="margin-top:1rem; background:#E0F2F1; padding:1rem; border-radius:10px;">
+                                <strong style="color:var(--primary-color)">EAP 万能公式：</strong>
+                                <p style="margin-top:0.5rem; font-size:0.95rem; color:#555;">
+                                    1. <strong>看见情绪</strong>：我看到/感到你现在很... (生气/委屈)<br>
+                                    2. <strong>肯定需求</strong>：你希望... (被尊重/自己做主)<br>
+                                    3. <strong>表达爱/界限</strong>：妈妈爱你，但是... / 我们一起...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 4: Love Bank -->
+            <div id="view-bank" class="app-view hidden">
+                <h2 class="view-title">
+                    <i class="fa-solid fa-piggy-bank" style="color:var(--primary-color)"></i> 爱的银行
+                    <div style="display:inline-flex; gap:0.5rem;">
+                        <button class="info-btn" onclick="toggleBankInfo()">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </button>
+                        <button class="info-btn" onclick="toggleCalmDown()" style="color:#81C784;">
+                            <i class="fa-solid fa-leaf"></i>
+                        </button>
+                    </div>
+                </h2>
+
+                <!-- Calm Down Modal -->
+                <div id="calm-down-modal" class="modal-overlay hidden" onclick="toggleCalmDown()">
+                    <div class="modal-content" onclick="event.stopPropagation()" style="text-align:center;">
+                        <div class="modal-header">
+                            <h3><i class="fa-solid fa-leaf"></i> 一分钟冷静卡</h3>
+                            <button class="close-btn" onclick="toggleCalmDown()"><i
+                                    class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="breathing-circle">
+                            <span id="breath-text">吸气</span>
+                        </div>
+                        <p style="margin-top:1.5rem; color:#666;">暂停 · 呼吸 · 觉察</p>
+                    </div>
+                </div>
+
+                <div class="bank-balance-card">
+                    <div class="balance-label">当前爱心存款</div>
+                    <div class="balance-amount" id="love-balance">0</div>
+                    <div class="balance-unit">分</div>
+                </div>
+
+                <!-- Daily Check-in -->
+                <div class="check-in-card">
+                    <h3><i class="fa-solid fa-clipboard-check"></i> 每日自省 (10秒 Check-in)</h3>
+                    <div class="check-in-item">
+                        <span>1. 我今天有没有用情绪说话？</span>
+                        <div class="check-options">
+                            <button class="check-btn" onclick="toggleCheck(this)">是</button>
+                            <button class="check-btn" onclick="toggleCheck(this)">否</button>
+                        </div>
+                    </div>
+                    <div class="check-in-item">
+                        <span>2. 我有没有说一句让孩子感到被理解的话？</span>
+                        <div class="check-options">
+                            <button class="check-btn" onclick="toggleCheck(this)">是</button>
+                            <button class="check-btn" onclick="toggleCheck(this)">否</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Modal -->
+                <div id="bank-info-modal" class="modal-overlay hidden" onclick="toggleBankInfo()">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h3><i class="fa-solid fa-heart"></i> 关于爱的银行</h3>
+                            <button class="close-btn" onclick="toggleBankInfo()"><i
+                                    class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>亲爱的妈妈：</p>
+                            <p>我们的一言一行，都在孩子的心里存着一本账。</p>
+                            <p>每一次<strong>拥抱、肯定、接纳</strong>，都是在存入爱心，让亲子关系更稳固。</p>
+                            <p>每一次<strong>指责、挖苦、冷漠</strong>，都是在透支情感，让孩子的心离我们更远。</p>
+                            <p>请多做加分项，少做减分项，为孩子积攒满满的安全感和爱！</p>
+                        </div>
+                        <button class="modal-confirm-btn" onclick="toggleBankInfo()">我明白了</button>
+                    </div>
+                </div>
+
+                <div class="deposit-section">
+                    <h3>今天为孩子做了什么？</h3>
+                    <div class="deposit-list" id="deposit-list">
+                        <!-- Items injected by JS -->
+                    </div>
+
+                    <div class="custom-deposit">
+                        <div class="form-group">
+                            <input type="text" id="custom-action" placeholder="其他 (自己写)">
+                            <input type="number" id="custom-score" placeholder="分" style="width: 60px;">
+                        </div>
+                        <button class="add-btn" onclick="addCustomDeposit()">添加记录</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>首页</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-book-open"></i>课程</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i>心情</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-user"></i>我的</a>
+        </nav>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
